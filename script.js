@@ -1,7 +1,7 @@
 
-//Declare a variable to store the searched city
+
 var city = "";
-// variable declaration
+
 var searchCity = $("#search-city");
 var searchButton = $("#search-button");
 var clearButton = $("#clear-history");
@@ -10,8 +10,9 @@ var currentTemperature = $("#temperature");
 var currentHumidty = $("#humidity");
 var currentWSpeed = $("#wind-speed");
 var currentUvindex = $("#uv-index");
+
 var cityS = [];
-// searches the city to see if it exists in the entries from the storage
+
 function find(city) {
     for (var i = 0; i < cityS.length; i++) {
         if (city === cityS[i]) {
@@ -20,9 +21,9 @@ function find(city) {
     }
     return 1;
 }
-//Set up the API key
+
 var APIKey = "f5b1f646d2800bb178c05c721f1a3bfd";
-// Display the cuf5b1f646d2800bb178c05c721f1a3bfdrent and future weather to the user after grabing the city form the input text box.
+
 function displayWeather(event) {
     event.preventDefault();
     if (searchCity.val().trim() !== "") {
@@ -30,37 +31,30 @@ function displayWeather(event) {
         currentWeather(city);
     }
 }
-// Here we create the AJAX call
+
 function currentWeather(city) {
-    // Here we build the URL so we can get a data from server side.
     var queryURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&APPID=" + APIKey;
     $.ajax({
         url: queryURL,
         method: "GET",
     }).then(function (response) {
 
-        // parse the response to display the current weather including the City name. the Date and the weather icon. 
         console.log(response);
-        //Dta object from server side Api for icon property.
+
         var weathericon = response.weather[0].icon;
         var iconurl = "https://openweathermap.org/img/wn/" + weathericon + "@2x.png";
-        // The date format method is taken from the  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date
         var date = new Date(response.dt * 1000).toLocaleDateString();
-        //parse the response for name of city and concanatig the date and icon.
         $(currentCity).html(response.name + "(" + date + ")" + "<img src=" + iconurl + ">");
-        // parse the response to display the current temperature.
-        // Convert the temp to fahrenheit
 
         var tempF = (response.main.temp - 273.15) * 1.80 + 32;
         $(currentTemperature).html((tempF).toFixed(2) + "&#8457");
-        // Display the Humidity
+
         $(currentHumidty).html(response.main.humidity + "%");
-        //Display Wind speed and convert to MPH
+
         var ws = response.wind.speed;
         var windsmph = (ws * 2.237).toFixed(1);
         $(currentWSpeed).html(windsmph + "MPH");
-        // Display UVIndex.
-        //By Geographic coordinates method and using appid and coordinates as a parameter we are going build our uv query url inside the function below.
+
         UVIndex(response.coord.lon, response.coord.lat);
         forecast(response.id);
         if (response.cod == 200) {
@@ -83,9 +77,9 @@ function currentWeather(city) {
 
     });
 }
-// This function returns the UVIindex response.
+
 function UVIndex(ln, lt) {
-    //lets build the url for uvindex.
+
     var uvqURL = "https://api.openweathermap.org/data/2.5/uvi?appid=" + APIKey + "&lat=" + lt + "&lon=" + ln;
     $.ajax({
         url: uvqURL,
@@ -95,9 +89,8 @@ function UVIndex(ln, lt) {
     });
 }
 
-// Here we display the 5 days forecast for the current city.
 function forecast(cityid) {
-    var dayover = false;
+
     var queryforcastURL = "https://api.openweathermap.org/data/2.5/forecast?id=" + cityid + "&appid=" + APIKey;
     $.ajax({
         url: queryforcastURL,
@@ -121,14 +114,13 @@ function forecast(cityid) {
     });
 }
 
-//Daynamically add the passed city on the search history
 function addToList(city) {
     var listEl = $("<li>" + city + "</li>");
     $(listEl).attr("class", "list-group-item");
     $(listEl).attr("data-value", city);
     $(".list-group").append(listEl);
 }
-// display the past search again when the list group item is clicked in search history
+
 function recallCitys(event) {
     var liEl = event.target;
     if (event.target.matches("li")) {
@@ -138,7 +130,6 @@ function recallCitys(event) {
 
 }
 
-// render function
 function renderlastCity() {
     $("ul").empty();
     var cityS = JSON.parse(localStorage.getItem("cityname"));
@@ -152,7 +143,7 @@ function renderlastCity() {
     }
 
 }
-//Clear the search history from the page
+
 function clearHolder(event) {
     event.preventDefault();
     cityS = [];
@@ -160,7 +151,7 @@ function clearHolder(event) {
     document.location.reload();
 
 }
-//Click Handlers
+
 $("#search-button").on("click", displayWeather);
 $(document).on("click", recallCitys);
 $(window).on("load", renderlastCity);
